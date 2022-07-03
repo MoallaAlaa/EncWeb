@@ -68,7 +68,25 @@
     <artifactId>jaxb-api</artifactId>
     
 </dependency>
+
+<dependency>
+   <groupId>commons-fileupload</groupId>
+   <artifactId>commons-fileupload</artifactId>
+      <version>1.4</version>
+</dependency>
+
+<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+	  		 <groupId>org.json</groupId>
+	  		 	<artifactId>json</artifactId>
+  			 <version>20080701</version>
+		</dependency>
 	</dependencies>
+	
 
 	<build>
 		<plugins>
