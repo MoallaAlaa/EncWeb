@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import tn.biat.encweb.model.Bordereaux;
 import tn.biat.encweb.model.Cheque;
 import tn.biat.encweb.service.ChequeService;
 
@@ -20,17 +21,19 @@ import tn.biat.encweb.service.ChequeService;
 @RestController
 @RequestMapping("/api/cheque")
 public class ChequeController {
-	
+
 	@Autowired
-	ChequeService chequeServ ;
-	
+	ChequeService chequeServ;
+
 	@PostMapping("/addCheque")
-	public ResponseEntity<Object> addCheque(@RequestParam(value = "file", required = true) MultipartFile file, @RequestParam (value = "cheque", required = false) String cheque)throws IOException{
-		Cheque c = new ObjectMapper().readValue(cheque , Cheque.class);
-		return chequeServ.addCheque(file, c);
-		
+	public ResponseEntity<Object> addCheque(@RequestParam(value = "file", required = true) MultipartFile file,
+			@RequestParam(value = "cheque", required = false) String cheque,
+			@RequestParam(value = "bordereaux", required = false) String bordereaux) throws IOException {
+
+		Cheque c = new ObjectMapper().readValue(cheque, Cheque.class);
+		Bordereaux b = new ObjectMapper().readValue(bordereaux, Bordereaux.class);
+		return chequeServ.addCheque(file, c, b);
+
 	}
-	
 
 }
-
