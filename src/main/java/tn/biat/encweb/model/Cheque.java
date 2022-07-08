@@ -7,12 +7,18 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +31,9 @@ import tn.biat.encweb.configurations.files.FileDB;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "cheques", uniqueConstraints = { @UniqueConstraint(columnNames = "numCheque"), })
+@Audited
 public class Cheque {
 
 	@Id
@@ -41,11 +49,17 @@ public class Cheque {
 	@OneToOne(cascade = CascadeType.ALL)
 	private FileDB imgCheque;
 
-	@Enumerated(EnumType.STRING)
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "devise_id", referencedColumnName = "id")
+	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private Devise devise;
 
 	@ManyToOne
 	@JoinColumn(name = "bordereaux_id", nullable = false)
 	private Bordereaux bordereaux;
+
+	@NotBlank
+	@Enumerated(EnumType.STRING)
+	private StatutEncaisssement statutEncaisssement;
 
 }

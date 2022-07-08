@@ -18,15 +18,18 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "devise")
-public class Devise {
 
+@Table(name = "banque")
+public class Banque {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@NotBlank
-	@Size(max = 3)
-	private String label;
+	@Size(max = 20)
+	private String nom;
 
+	@NotBlank
+	@Size(max = 120)
+	private String adresse;
 }

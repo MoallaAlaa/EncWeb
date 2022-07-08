@@ -7,6 +7,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.envers.Audited;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import lombok.Setter;
 @Table(name = "files")
 @Getter
 @Setter
+@Audited
 public class FileDB {
 	@Id
 	@GeneratedValue(generator = "uuid")
@@ -24,8 +26,9 @@ public class FileDB {
 	private String type;
 	@Lob
 	private byte[] data;
-	
-	public FileDB() {}
+
+	public FileDB() {
+	}
 
 	public FileDB(String name, String type, byte[] data) {
 		this.name = name;
