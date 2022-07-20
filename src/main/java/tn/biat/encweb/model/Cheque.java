@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
@@ -34,7 +33,7 @@ import tn.biat.encweb.configurations.files.FileDB;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "cheques", uniqueConstraints = { @UniqueConstraint(columnNames = "numCheque"), })
 @Audited
-public class Cheque {
+public class Cheque extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,7 +48,7 @@ public class Cheque {
 	@OneToOne(cascade = CascadeType.ALL)
 	private FileDB imgCheque;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "devise_id", referencedColumnName = "id")
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private Devise devise;
@@ -58,7 +57,6 @@ public class Cheque {
 	@JoinColumn(name = "bordereaux_id", nullable = false)
 	private Bordereaux bordereaux;
 
-	@NotBlank
 	@Enumerated(EnumType.STRING)
 	private StatutEncaisssement statutEncaisssement;
 

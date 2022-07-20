@@ -14,8 +14,10 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,8 +41,10 @@ public class Bordereaux {
 	private Long numBordereaux;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
+	@DateTimeFormat(pattern = "dd-MM-yyyy")
 	private Date dateBordereaux;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "bordereaux")
 	private Set<Cheque> cheques = new HashSet<>();
 
