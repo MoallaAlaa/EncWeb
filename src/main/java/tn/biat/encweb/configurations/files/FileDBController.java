@@ -21,7 +21,7 @@ import tn.biat.encweb.payloads.responses.MessageResponse;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("")
+@RequestMapping("/api")
 public class FileDBController {
 
 	@Autowired
@@ -58,7 +58,4 @@ public class FileDBController {
 				.body(fileDB.getData());
 	}
 
-	
-
 }
-

@@ -52,4 +52,10 @@ public class ChequeController {
 		return ResponseEntity.ok(" succes !");
 	}
 
+	@GetMapping("/ChequesEnRoute")
+	public ResponseEntity<?> AfficherChequesEnRoute() {
+
+		return ResponseEntity.ok(chequeServ.ListeChequesEnRouteEncaissement());
+	}
+
 }

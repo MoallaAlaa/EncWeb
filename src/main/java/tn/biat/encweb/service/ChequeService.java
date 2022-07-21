@@ -131,4 +131,20 @@ public class ChequeService {
 		}
 	}
 
+	public List<Cheque> ListeChequesEnRouteEncaissement() {
+		List<Cheque> cs = chequeRepo.findAll();
+		List<Cheque> newCs = new ArrayList<Cheque>();
+
+		for (Cheque c : cs) {
+			if ((c.getStatutEncaisssement() == StatutEncaisssement.En_Route)
+					|| (c.getStatutEncaisssement() == StatutEncaisssement.Saisie)) {
+				newCs.add(c);
+
+			}
+
+		}
+
+		return newCs;
+	}
+
 }
