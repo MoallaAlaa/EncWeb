@@ -13,7 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
@@ -31,7 +30,7 @@ import tn.biat.encweb.configurations.files.FileDB;
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "cheques", uniqueConstraints = { @UniqueConstraint(columnNames = "numCheque"), })
+@Table(name = "cheques")
 @Audited
 public class Cheque extends Auditable {
 

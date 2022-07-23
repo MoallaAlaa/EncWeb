@@ -1,6 +1,7 @@
 package tn.biat.encweb.controllers;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,4 +59,17 @@ public class ChequeController {
 		return ResponseEntity.ok(chequeServ.ListeChequesEnRouteEncaissement());
 	}
 
+	@GetMapping("/ChequesRecuParEncaissement")
+	public ResponseEntity<?> ChequesRecuParEncaissement(@RequestParam(value = "cheque", required = false) Long chequeId)
+			throws ParseException {
+		chequeServ.ConfirmerChequesRecu(chequeId);
+
+		return ResponseEntity.ok(" succes !");
+	}
+
+	@GetMapping("/AfficherListeChequeRecu")
+	public ResponseEntity<?> AfficherListeChequeRecu() {
+
+		return ResponseEntity.ok(chequeServ.ListeChequesRecu());
+	}
 }

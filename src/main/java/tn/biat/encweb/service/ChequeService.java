@@ -2,6 +2,7 @@ package tn.biat.encweb.service;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,9 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 import tn.biat.encweb.configurations.files.FileDB;
 import tn.biat.encweb.configurations.files.FileDBRepository;
 import tn.biat.encweb.dao.BordereauxRepository;
+import tn.biat.encweb.dao.ChequeRecuEncaissementRepository;
 import tn.biat.encweb.dao.ChequeRepository;
 import tn.biat.encweb.model.Bordereaux;
 import tn.biat.encweb.model.Cheque;
+import tn.biat.encweb.model.ChequeRecuEncaissement;
 import tn.biat.encweb.model.StatutEncaisssement;
 import tn.biat.encweb.payloads.responses.FinJourneeTab;
 import tn.biat.encweb.payloads.responses.MessageResponse;
@@ -30,6 +33,9 @@ public class ChequeService {
 
 	@Autowired
 	ChequeRepository chequeRepo;
+
+	@Autowired
+	ChequeRecuEncaissementRepository chequeRecuRepo;
 
 	@Autowired
 	FileDBRepository fileDBRepository;
@@ -147,4 +153,24 @@ public class ChequeService {
 		return newCs;
 	}
 
+	public void ConfirmerChequesRecu(Long chequeId) throws ParseException {
+
+		Cheque c = chequeRepo.findById(chequeId).orElse(null);
+		c.setStatutEncaisssement(StatutEncaisssement.Arrivee);
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = new Date();
+		String now = dateFormat.format(date);
+		Date dateNow = dateFormat.parse(now);
+
+		ChequeRecuEncaissement chequeRecu = new ChequeRecuEncaissement(c.getId(), c.getNumCheque(), c.getMontant(),
+				c.getImgCheque(), c.getDevise(), c.getBordereaux(), c.getStatutEncaisssement(), dateNow);
+		chequeRecu.setCreatedBy(c.getCreatedBy());
+		chequeRecu.setCreatedDate(c.getCreatedDate());
+		chequeRecuRepo.save(chequeRecu);
+	}
+
+	public List<ChequeRecuEncaissement> ListeChequesRecu() {
+
+		return chequeRecuRepo.findAll();
+	}
 }
