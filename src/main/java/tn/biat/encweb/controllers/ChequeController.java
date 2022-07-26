@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tn.biat.encweb.model.Bordereaux;
 import tn.biat.encweb.model.Cheque;
+import tn.biat.encweb.payloads.requests.AddChequeRequest;
 import tn.biat.encweb.service.ChequeService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -30,11 +31,13 @@ public class ChequeController {
 
 	@PostMapping("/addCheque")
 	public ResponseEntity<Object> addCheque(@RequestParam(value = "file", required = true) MultipartFile file,
-			@RequestParam(value = "cheque", required = false) String cheque,
-			@RequestParam(value = "bordereaux", required = false) String bordereaux) throws IOException {
+			@RequestParam(value = "cheque", required = true) String cheque) throws IOException {
 
-		Cheque c = new ObjectMapper().readValue(cheque, Cheque.class);
-		Bordereaux b = new ObjectMapper().readValue(bordereaux, Bordereaux.class);
+		AddChequeRequest cb = new ObjectMapper().readValue(cheque, AddChequeRequest.class);
+
+		Cheque c = new Cheque(cb.getNumCheque(), cb.getMontant(), cb.getDevise());
+		Bordereaux b = new Bordereaux(cb.getNumBordereaux(), cb.getDateBordereaux());
+
 		return chequeServ.addCheque(file, c, b);
 
 	}

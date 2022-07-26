@@ -59,4 +59,11 @@ public class Cheque extends Auditable {
 	@Enumerated(EnumType.STRING)
 	private StatutEncaisssement statutEncaisssement;
 
+	public Cheque(@NotNull Long numCheque, @NotNull float montant, Devise devise) {
+		super();
+		this.numCheque = numCheque;
+		this.montant = montant;
+		this.devise = devise;
+	}
+
 }

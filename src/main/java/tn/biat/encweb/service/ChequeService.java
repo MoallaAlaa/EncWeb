@@ -153,6 +153,7 @@ public class ChequeService {
 		return newCs;
 	}
 
+	@Transactional
 	public void ConfirmerChequesRecu(Long chequeId) throws ParseException {
 
 		Cheque c = chequeRepo.findById(chequeId).orElse(null);
@@ -162,11 +163,7 @@ public class ChequeService {
 		String now = dateFormat.format(date);
 		Date dateNow = dateFormat.parse(now);
 
-		ChequeRecuEncaissement chequeRecu = new ChequeRecuEncaissement(c.getId(), c.getNumCheque(), c.getMontant(),
-				c.getImgCheque(), c.getDevise(), c.getBordereaux(), c.getStatutEncaisssement(), dateNow);
-		chequeRecu.setCreatedBy(c.getCreatedBy());
-		chequeRecu.setCreatedDate(c.getCreatedDate());
-		chequeRecuRepo.save(chequeRecu);
+		chequeRecuRepo.insertChild(c.getId(), dateNow);
 	}
 
 	public List<ChequeRecuEncaissement> ListeChequesRecu() {

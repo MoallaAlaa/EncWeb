@@ -48,4 +48,10 @@ public class Bordereaux {
 	@OneToMany(mappedBy = "bordereaux")
 	private Set<Cheque> cheques = new HashSet<>();
 
+	public Bordereaux(@NotNull Long numBordereaux, Date dateBordereaux) {
+		super();
+		this.numBordereaux = numBordereaux;
+		this.dateBordereaux = dateBordereaux;
+	}
+
 }
