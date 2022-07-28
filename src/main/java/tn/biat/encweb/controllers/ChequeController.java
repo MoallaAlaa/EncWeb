@@ -18,7 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tn.biat.encweb.model.Bordereaux;
 import tn.biat.encweb.model.Cheque;
+import tn.biat.encweb.payloads.requests.AddBordereauRequest;
 import tn.biat.encweb.payloads.requests.AddChequeRequest;
+import tn.biat.encweb.payloads.requests.AddChequeRequestt;
 import tn.biat.encweb.service.ChequeService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -39,6 +41,18 @@ public class ChequeController {
 		Bordereaux b = new Bordereaux(cb.getNumBordereaux(), cb.getDateBordereaux());
 
 		return chequeServ.addCheque(file, c, b);
+
+	}
+
+	@PostMapping("/addCheque2")
+	public ResponseEntity<Object> addCheque2(@RequestParam(value = "bordereau", required = true) String bordereau)
+			throws IOException {
+
+		AddBordereauRequest cb = new ObjectMapper().readValue(bordereau, AddBordereauRequest.class);
+		Bordereaux b = new Bordereaux(cb.getNumBordereaux(), cb.getDateBordereaux());
+		List<AddChequeRequestt> cs = cb.getCheques();
+
+		return chequeServ.addCheque2(b, cs);
 
 	}
 
@@ -74,5 +88,11 @@ public class ChequeController {
 	public ResponseEntity<?> AfficherListeChequeRecu() {
 
 		return ResponseEntity.ok(chequeServ.ListeChequesRecu());
+	}
+
+	@GetMapping("/AfficherListeCheque")
+	public ResponseEntity<?> AfficherListeCheque() {
+
+		return ResponseEntity.ok(chequeServ.ListeCheques());
 	}
 }

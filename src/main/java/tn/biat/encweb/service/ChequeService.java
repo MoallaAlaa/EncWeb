@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,7 @@ import tn.biat.encweb.model.Bordereaux;
 import tn.biat.encweb.model.Cheque;
 import tn.biat.encweb.model.ChequeRecuEncaissement;
 import tn.biat.encweb.model.StatutEncaisssement;
+import tn.biat.encweb.payloads.requests.AddChequeRequestt;
 import tn.biat.encweb.payloads.responses.FinJourneeTab;
 import tn.biat.encweb.payloads.responses.MessageResponse;
 
@@ -169,5 +171,42 @@ public class ChequeService {
 	public List<ChequeRecuEncaissement> ListeChequesRecu() {
 
 		return chequeRecuRepo.findAll();
+	}
+
+	public List<Cheque> ListeCheques() {
+
+		return chequeRepo.findAll();
+	}
+
+	@Transactional
+	public ResponseEntity<Object> addCheque2(Bordereaux b, List<AddChequeRequestt> cs) {
+
+		bordereauxRepo.save(b);
+
+		for (AddChequeRequestt a : cs) {
+
+			Cheque c = new Cheque(a.getNumCheque(), a.getMontant(), a.getDevise());
+			c.setBordereaux(b);
+			c.setStatutEncaisssement(StatutEncaisssement.Saisie);
+			String img = a.getPhotos();
+			String base64Image = img.split(",")[1];
+			String aux = img.split(",")[0];
+			String aux2 = aux.split(";")[0];
+			String base64ImageType = aux2.split(":")[1];
+
+			FileDB FileDB = new FileDB(c.getBordereaux().getNumBordereaux().toString(), base64ImageType,
+					Base64.getDecoder().decode(base64Image));
+
+			if (FileDB != null) {
+				fileDBRepository.save(FileDB);
+				c.setImgCheque(FileDB);
+
+			}
+
+			chequeRepo.save(c);
+
+		}
+
+		return null;
 	}
 }
