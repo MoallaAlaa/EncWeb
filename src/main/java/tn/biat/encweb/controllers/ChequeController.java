@@ -9,17 +9,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tn.biat.encweb.model.Bordereaux;
-import tn.biat.encweb.model.Cheque;
 import tn.biat.encweb.payloads.requests.AddBordereauRequest;
-import tn.biat.encweb.payloads.requests.AddChequeRequest;
 import tn.biat.encweb.payloads.requests.AddChequeRequestt;
 import tn.biat.encweb.service.ChequeService;
 
@@ -30,19 +28,6 @@ public class ChequeController {
 
 	@Autowired
 	ChequeService chequeServ;
-
-	@PostMapping("/addCheque")
-	public ResponseEntity<Object> addCheque(@RequestParam(value = "file", required = true) MultipartFile file,
-			@RequestParam(value = "cheque", required = true) String cheque) throws IOException {
-
-		AddChequeRequest cb = new ObjectMapper().readValue(cheque, AddChequeRequest.class);
-
-		Cheque c = new Cheque(cb.getNumCheque(), cb.getMontant(), cb.getDevise());
-		Bordereaux b = new Bordereaux(cb.getNumBordereaux(), cb.getDateBordereaux());
-
-		return chequeServ.addCheque(file, c, b);
-
-	}
 
 	@PostMapping("/addCheque2")
 	public ResponseEntity<Object> addCheque2(@RequestParam(value = "bordereau", required = true) String bordereau)
@@ -95,4 +80,28 @@ public class ChequeController {
 
 		return ResponseEntity.ok(chequeServ.ListeCheques());
 	}
+
+	@GetMapping("/AfficherListeChequeRejeter")
+	public ResponseEntity<?> AfficherListeChequeRejeter() {
+
+		return ResponseEntity.ok(chequeServ.ListeChequesRejeter());
+
+	}
+
+	@PutMapping("/ChequesRejetRecuParAgence")
+	public ResponseEntity<?> ChequesRejetRecuParAgence(
+			@RequestParam(value = "chequeId", required = false) Long chequeId) throws ParseException {
+		chequeServ.ConfirmerChequesRejetRecu(chequeId);
+
+		return ResponseEntity.ok(" succes !");
+	}
+
+	@GetMapping("/RejeterCheque")
+	public ResponseEntity<?> RejeterCheque(@RequestParam(value = "chequeId", required = false) Long chequeId,
+			@RequestParam(value = "motifRejet", required = false) String motifRejet) throws ParseException {
+		chequeServ.RejetEncaissement(chequeId, motifRejet);
+		return ResponseEntity.ok(" succes !");
+
+	}
+
 }
