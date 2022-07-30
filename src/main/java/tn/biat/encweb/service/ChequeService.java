@@ -21,10 +21,12 @@ import tn.biat.encweb.dao.BordereauxRepository;
 import tn.biat.encweb.dao.ChequeRecuEncaissementRepository;
 import tn.biat.encweb.dao.ChequeRejeterEncaissementRepository;
 import tn.biat.encweb.dao.ChequeRepository;
+import tn.biat.encweb.dao.ChequeTraiterEncaissementRepository;
 import tn.biat.encweb.model.Bordereaux;
 import tn.biat.encweb.model.Cheque;
 import tn.biat.encweb.model.ChequeRecuEncaissement;
 import tn.biat.encweb.model.ChequeRejeterEncaissement;
+import tn.biat.encweb.model.ChequeTraiterEncaissement;
 import tn.biat.encweb.model.StatutEncaisssement;
 import tn.biat.encweb.payloads.requests.AddChequeRequestt;
 import tn.biat.encweb.payloads.responses.FinJourneeTab;
@@ -46,6 +48,9 @@ public class ChequeService {
 
 	@Autowired
 	BordereauxRepository bordereauxRepo;
+
+	@Autowired
+	ChequeTraiterEncaissementRepository chequeTraiterRepo;
 
 	@Transactional
 	public ResponseEntity<Object> addCheque2(Bordereaux b, List<AddChequeRequestt> cs) {
@@ -192,4 +197,19 @@ public class ChequeService {
 		chequeRejetRepo.save(c);
 	}
 
+	public List<ChequeTraiterEncaissement> ListeChequesTraiter() {
+
+		return chequeTraiterRepo.findAll();
+	}
+
+	@Transactional
+	public void CreateChequeTraiter(Long id, String status, Date dateReceptionBanque, Date dateSortie, Long banqueId,
+			Date dateOuverture, Long clientId
+
+	) {
+
+		chequeTraiterRepo.newChequeTraitee(id, status, dateReceptionBanque, dateSortie, banqueId, dateOuverture,
+				clientId);
+
+	}
 }

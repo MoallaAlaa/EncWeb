@@ -3,7 +3,7 @@ package tn.biat.encweb.model;
 import java.util.Date;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
@@ -12,7 +12,6 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,11 +25,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Audited
 @Table(name = "cheque_traitee_encaissement")
-public class ChequeTraiterEncaissement extends Cheque {
+public class ChequeTraiterEncaissement extends ChequeRecuEncaissement {
 
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JsonIgnore
+	@ManyToOne
+	@JoinColumn(name = "banque_id", referencedColumnName = "id")
 	private Banque Banque;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
@@ -41,5 +40,13 @@ public class ChequeTraiterEncaissement extends Cheque {
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date dateSortie;
+
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private Date dateOuverture;
+
+	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+	@ManyToOne
+	@JoinColumn(name = "client_id", referencedColumnName = "id")
+	private Client client;
 
 }

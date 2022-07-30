@@ -2,6 +2,7 @@ package tn.biat.encweb.controllers;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -88,7 +88,7 @@ public class ChequeController {
 
 	}
 
-	@PutMapping("/ChequesRejetRecuParAgence")
+	@GetMapping("/ChequesRejetRecuParAgence")
 	public ResponseEntity<?> ChequesRejetRecuParAgence(
 			@RequestParam(value = "chequeId", required = false) Long chequeId) throws ParseException {
 		chequeServ.ConfirmerChequesRejetRecu(chequeId);
@@ -100,6 +100,30 @@ public class ChequeController {
 	public ResponseEntity<?> RejeterCheque(@RequestParam(value = "chequeId", required = false) Long chequeId,
 			@RequestParam(value = "motifRejet", required = false) String motifRejet) throws ParseException {
 		chequeServ.RejetEncaissement(chequeId, motifRejet);
+		return ResponseEntity.ok(" succes !");
+
+	}
+
+	@GetMapping("/AfficherListeChequeTraiter")
+	public ResponseEntity<?> AfficherListeChequeTraiter() {
+
+		return ResponseEntity.ok(chequeServ.ListeChequesTraiter());
+
+	}
+
+	@GetMapping("/AddChequeTraiter")
+	public ResponseEntity<?> AddChequeTraiter(@RequestParam(value = "chequeId", required = false) Long chequeId,
+			@RequestParam(value = "status", required = false) String status,
+			@RequestParam(value = "dateReceptionBanque", required = false) Date dateReceptionBanque,
+			@RequestParam(value = "dateSortie", required = false) Date dateSortie,
+			@RequestParam(value = "banqueId", required = false) Long banqueId,
+			@RequestParam(value = "dateOuverture", required = false) Date dateOuverture,
+			@RequestParam(value = "clientId", required = false) Long clientId
+
+	) throws ParseException {
+
+		chequeServ.CreateChequeTraiter(chequeId, status, dateReceptionBanque, dateSortie, banqueId, dateOuverture,
+				clientId);
 		return ResponseEntity.ok(" succes !");
 
 	}
