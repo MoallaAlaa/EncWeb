@@ -22,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Audited
 @Table(name = "cheque_rejet_encaissement")
-public class ChequeRejeterEncaissement extends Cheque {
+public class ChequeRejeterEncaissement extends ChequeRecuEncaissement {
 
 	@NotBlank
 	private String motifRejet;

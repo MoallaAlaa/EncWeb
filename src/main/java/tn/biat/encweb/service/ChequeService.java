@@ -1,5 +1,7 @@
 package tn.biat.encweb.service;
 
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.contains;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,11 +9,14 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +27,13 @@ import tn.biat.encweb.dao.ChequeRecuEncaissementRepository;
 import tn.biat.encweb.dao.ChequeRejeterEncaissementRepository;
 import tn.biat.encweb.dao.ChequeRepository;
 import tn.biat.encweb.dao.ChequeTraiterEncaissementRepository;
+import tn.biat.encweb.dao.DeviseRepository;
 import tn.biat.encweb.model.Bordereaux;
 import tn.biat.encweb.model.Cheque;
 import tn.biat.encweb.model.ChequeRecuEncaissement;
 import tn.biat.encweb.model.ChequeRejeterEncaissement;
 import tn.biat.encweb.model.ChequeTraiterEncaissement;
+import tn.biat.encweb.model.Client;
 import tn.biat.encweb.model.StatutEncaisssement;
 import tn.biat.encweb.payloads.requests.AddChequeRequestt;
 import tn.biat.encweb.payloads.responses.FinJourneeTab;
@@ -51,6 +58,9 @@ public class ChequeService {
 
 	@Autowired
 	ChequeTraiterEncaissementRepository chequeTraiterRepo;
+
+	@Autowired
+	DeviseRepository deviseRepo;
 
 	@Transactional
 	public ResponseEntity<Object> addCheque2(Bordereaux b, List<AddChequeRequestt> cs) {
@@ -94,8 +104,8 @@ public class ChequeService {
 
 		for (Bordereaux b : bordereaux) {
 
+//			if (now.equals(dateFormat.format(b.getCreatedDate()))) {
 			if (now.equals(dateFormat.format(b.getDateBordereaux()))) {
-
 				newBordereaux.add(b);
 			}
 
@@ -171,12 +181,13 @@ public class ChequeService {
 
 	@Transactional
 	public void RejetEncaissement(Long chequeId, String motifRejet) throws ParseException {
+		Cheque c = chequeRepo.findById(chequeId).orElse(null);
 
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
 		String now = dateFormat.format(date);
 		Date dateNow = dateFormat.parse(now);
-		chequeRejetRepo.newChequeRejetes(chequeId, motifRejet, dateNow);
+		chequeRejetRepo.newChequeRejetes(c.getId(), motifRejet, dateNow);
 
 	}
 
@@ -207,9 +218,105 @@ public class ChequeService {
 			Date dateOuverture, Long clientId
 
 	) {
+		Cheque c = chequeRepo.findById(id).orElse(null);
 
-		chequeTraiterRepo.newChequeTraitee(id, status, dateReceptionBanque, dateSortie, banqueId, dateOuverture,
+		chequeTraiterRepo.newChequeTraitee(c.getId(), status, dateReceptionBanque, dateSortie, banqueId, dateOuverture,
 				clientId);
 
 	}
+
+	public List<ChequeTraiterEncaissement> RechercheSansMontantDate(Long numBordereaux, Long numCheques, Long numCompte,
+			String devise) throws ParseException {
+		ExampleMatcher matcher = ExampleMatcher.matchingAll().withMatcher("numCheque", contains().ignoreCase())
+				.withMatcher("numBordereaux", contains().ignoreCase())
+				.withMatcher("numeroCompte", contains().ignoreCase()).withMatcher("label", contains().ignoreCase())
+				.withIgnorePaths("montant").withIgnorePaths("dateBordereaux");
+
+		ChequeTraiterEncaissement c = new ChequeTraiterEncaissement();
+		Bordereaux b = new Bordereaux();
+		Client cl = new Client();
+
+		if (devise != null)
+			c.setDevise(deviseRepo.findByLabel(devise));
+
+		else
+			c.setDevise(null);
+
+		c.setNumCheque(numCheques);
+
+		b.setNumBordereaux(numBordereaux);
+		c.setBordereaux(b);
+
+		cl.setNumeroCompte(numCompte);
+		c.setClient(cl);
+
+		return chequeTraiterRepo.findAll(Example.of(c, matcher));
+	}
+
+	public List<ChequeTraiterEncaissement> RechercheAvecMontant(List<ChequeTraiterEncaissement> listeC, float montant)
+			throws ParseException {
+
+		List<ChequeTraiterEncaissement> newListeC = new ArrayList<ChequeTraiterEncaissement>();
+		for (ChequeTraiterEncaissement c : listeC) {
+			if (c.getMontant() == montant) {
+				newListeC.add(c);
+			}
+
+		}
+
+		return newListeC;
+	}
+
+	public List<ChequeTraiterEncaissement> RechercheAvecDate(List<ChequeTraiterEncaissement> listeC, String date)
+			throws ParseException {
+
+		List<ChequeTraiterEncaissement> newListeC = new ArrayList<ChequeTraiterEncaissement>();
+
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+		for (ChequeTraiterEncaissement c : listeC) {
+
+			if (dateFormat.format(c.getBordereaux().getDateBordereaux()).equals(date)) {
+
+				newListeC.add(c);
+			}
+
+		}
+
+		return newListeC;
+	}
+
+	public List<ChequeTraiterEncaissement> Recherche(Optional<Long> numBordereaux, Optional<Long> numCheques,
+			Optional<Long> numCompte, Optional<String> devise, Optional<String> montant,
+			Optional<String> dateBordereaux) throws ParseException {
+
+		List<ChequeTraiterEncaissement> newListeC = RechercheSansMontantDate(numBordereaux.orElse(null),
+				numCheques.orElse(null), numCompte.orElse(null), devise.orElse(null));
+		List<ChequeTraiterEncaissement> ListeC = newListeC;
+
+		String m = montant.orElse(null);
+		String da = dateBordereaux.orElse(null);
+
+		if ((!m.isEmpty()) && (da.isEmpty())) {
+
+			float montants = Float.parseFloat(m);
+			ListeC = RechercheAvecMontant(newListeC, montants);
+
+		}
+
+		if ((m.isEmpty()) && (!da.isEmpty())) {
+
+			ListeC = RechercheAvecDate(newListeC, da);
+
+		}
+
+		if ((!m.isEmpty()) && (!da.isEmpty())) {
+			float montants = Float.parseFloat(m);
+			ListeC = RechercheAvecDate(RechercheAvecMontant(newListeC, montants), da);
+
+		}
+
+		return ListeC;
+	}
+
 }

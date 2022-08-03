@@ -31,7 +31,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "bordereaux", uniqueConstraints = { @UniqueConstraint(columnNames = "numBordereaux"), })
 @Audited
-public class Bordereaux {
+public class Bordereaux extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

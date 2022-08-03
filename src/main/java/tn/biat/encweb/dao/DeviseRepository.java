@@ -8,4 +8,6 @@ import tn.biat.encweb.model.Devise;
 @Repository
 public interface DeviseRepository extends JpaRepository<Devise, Long> {
 
+	public Devise findByLabel(String label);
+
 }

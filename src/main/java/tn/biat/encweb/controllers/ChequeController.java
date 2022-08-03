@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import tn.biat.encweb.model.Bordereaux;
+import tn.biat.encweb.model.ChequeTraiterEncaissement;
 import tn.biat.encweb.payloads.requests.AddBordereauRequest;
 import tn.biat.encweb.payloads.requests.AddChequeRequestt;
 import tn.biat.encweb.service.ChequeService;
@@ -126,6 +128,55 @@ public class ChequeController {
 				clientId);
 		return ResponseEntity.ok(" succes !");
 
+	}
+
+	@GetMapping("/RechercheTest")
+	public ResponseEntity<?> RechercheTest(@RequestParam(value = "numBordereaux") Optional<Long> numBordereaux,
+			@RequestParam(value = "numCheques") Optional<Long> numCheques,
+			@RequestParam(value = "numCompte") Optional<Long> numCompte,
+			@RequestParam(value = "devise") Optional<String> devise,
+			@RequestParam(value = "montant") Optional<String> montant,
+			@RequestParam(value = "dateBordereaux") Optional<String> dateBordereaux) throws ParseException {
+
+		List<ChequeTraiterEncaissement> newListeC = chequeServ.RechercheSansMontantDate(numBordereaux.orElse(null),
+				numCheques.orElse(null), numCompte.orElse(null), devise.orElse(null));
+		List<ChequeTraiterEncaissement> ListeC = newListeC;
+
+		String m = montant.orElse(null);
+		String da = dateBordereaux.orElse(null);
+
+		if ((!m.isEmpty()) && (da.isEmpty())) {
+
+			float montants = Float.parseFloat(m);
+			ListeC = chequeServ.RechercheAvecMontant(newListeC, montants);
+
+		}
+
+		if ((m.isEmpty()) && (!da.isEmpty())) {
+
+			ListeC = chequeServ.RechercheAvecDate(newListeC, da);
+
+		}
+
+		if ((!m.isEmpty()) && (!da.isEmpty())) {
+			float montants = Float.parseFloat(m);
+			ListeC = chequeServ.RechercheAvecDate(chequeServ.RechercheAvecMontant(newListeC, montants), da);
+
+		}
+
+		return ResponseEntity.ok(ListeC);
+	}
+
+	@GetMapping("/Recherche")
+	public ResponseEntity<?> Recherche(@RequestParam(value = "numBordereaux") Optional<Long> numBordereaux,
+			@RequestParam(value = "numCheques") Optional<Long> numCheques,
+			@RequestParam(value = "numCompte") Optional<Long> numCompte,
+			@RequestParam(value = "devise") Optional<String> devise,
+			@RequestParam(value = "montant") Optional<String> montant,
+			@RequestParam(value = "dateBordereaux") Optional<String> dateBordereaux) throws ParseException {
+
+		return ResponseEntity
+				.ok(chequeServ.Recherche(numBordereaux, numCheques, numCompte, devise, montant, dateBordereaux));
 	}
 
 }

@@ -23,4 +23,5 @@ public interface ChequeTraiterEncaissementRepository extends JpaRepository<Chequ
 			@Param("clientId") Long clientId
 
 	);
+
 }
