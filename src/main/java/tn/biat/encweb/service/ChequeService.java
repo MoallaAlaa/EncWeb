@@ -34,6 +34,7 @@ import tn.biat.encweb.model.ChequeRecuEncaissement;
 import tn.biat.encweb.model.ChequeRejeterEncaissement;
 import tn.biat.encweb.model.ChequeTraiterEncaissement;
 import tn.biat.encweb.model.Client;
+import tn.biat.encweb.model.Devise;
 import tn.biat.encweb.model.StatutEncaisssement;
 import tn.biat.encweb.payloads.requests.AddChequeRequestt;
 import tn.biat.encweb.payloads.responses.FinJourneeTab;
@@ -105,7 +106,7 @@ public class ChequeService {
 		for (Bordereaux b : bordereaux) {
 
 //			if (now.equals(dateFormat.format(b.getCreatedDate()))) {
-			if (now.equals(dateFormat.format(b.getDateBordereaux()))) {
+			if (now.equals(dateFormat.format(b.getCreatedDate()))) {
 				newBordereaux.add(b);
 			}
 
@@ -229,19 +230,16 @@ public class ChequeService {
 			String devise) throws ParseException {
 		ExampleMatcher matcher = ExampleMatcher.matchingAll().withMatcher("numCheque", contains().ignoreCase())
 				.withMatcher("numBordereaux", contains().ignoreCase())
-				.withMatcher("numeroCompte", contains().ignoreCase()).withMatcher("label", contains().ignoreCase())
-				.withIgnorePaths("montant").withIgnorePaths("dateBordereaux");
+				.withMatcher("numeroCompte", contains().ignoreCase())
+				.withMatcher("devise.label", contains().ignoreCase()).withIgnorePaths("montant")
+				.withIgnorePaths("dateBordereaux");
 
 		ChequeTraiterEncaissement c = new ChequeTraiterEncaissement();
 		Bordereaux b = new Bordereaux();
 		Client cl = new Client();
+		Devise d = deviseRepo.findByLabel("EUR");
 
-		if (devise != null)
-			c.setDevise(deviseRepo.findByLabel(devise));
-
-		else
-			c.setDevise(null);
-
+		c.setDevise(d);
 		c.setNumCheque(numCheques);
 
 		b.setNumBordereaux(numBordereaux);
